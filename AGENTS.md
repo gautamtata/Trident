@@ -24,16 +24,19 @@ src/
     layout.tsx            # Root layout (light mode, Geist font)
     actions/
       topics.ts           # Server actions: CRUD for topics
-      config.ts           # Server actions: upsert config (email, cron, max articles)
+      companies.ts        # Server actions: CRUD for companies
+      config.ts           # Server actions: upsert config (schedule, email) + Trigger.dev schedule sync
       digests.ts          # Server actions: fetch digest history
   components/
     topic-form.tsx        # Client: dialog to add a new topic
     topic-list.tsx        # Client: list topics with pause/resume/delete
-    config-form.tsx       # Client: settings form (email, cron schedule)
+    company-form.tsx      # Client: dialog to add a company (name + optional domain)
+    company-list.tsx      # Client: list companies with pause/resume/delete
+    config-form.tsx       # Client: settings form (timezone, time, frequency, email)
     digest-history.tsx    # Server: table of past digest sends
     ui/                   # shadcn/ui primitives (button, card, table, badge, etc.)
   db/
-    schema.ts             # Drizzle schema: topics, articles, feeds, digests, config
+    schema.ts             # Drizzle schema: topics, companies, articles, feeds, digests, config
     index.ts              # DB connection (node-postgres, Supabase SSL)
     migrate.ts            # Migration runner
     migrations/           # Generated SQL migrations
@@ -54,24 +57,26 @@ drizzle.config.ts         # Drizzle Kit config (migrations, schema path)
 ## Database Tables
 
 - **topics** -- what to track (vertical, company, or keyword + Exa search query)
-- **articles** -- every result found, deduped by unique URL
+- **companies** -- companies to monitor (name + optional domain for domain-scoped search)
+- **articles** -- every result found, deduped by unique URL (FK to topics or companies)
 - **feeds** -- RSS feed URLs linked to topics
 - **digests** -- history of sent email digests (status: sent/failed)
-- **config** -- single-row settings (recipient email, cron schedule, max articles)
+- **config** -- single-row settings (email, timezone, delivery time, frequency, max articles)
 
-## Digest Pipeline (Trigger.dev cron)
+## Digest Pipeline (Trigger.dev dynamic schedule)
 
-Runs on schedule (default: weekdays 7am UTC):
+Schedule is configured via the dashboard (timezone, time, frequency) and synced to Trigger.dev via `schedules.create()` with `deduplicationKey`:
 
-1. Fetch config and active topics from DB
+1. Fetch config, active topics, and active companies from DB
 2. For each topic, search via Exa (`searchAndContents`)
-3. Fetch any linked RSS feeds
-4. Dedup new results against stored article URLs
-5. AI summarize and rank articles (`generateText` with gpt-4o-mini)
-6. Store new articles in DB
-7. Render React Email template
-8. Send via Resend
-9. Log digest record
+3. For each company, search via Exa with `category:"company"` + optional domain filtering
+4. Fetch any linked RSS feeds
+5. Dedup new results against stored article URLs
+6. AI summarize and rank articles (`generateText` with gpt-4o-mini)
+7. Store new articles in DB
+8. Render React Email template
+9. Send via Resend
+10. Log digest record
 
 ## Key Conventions
 
