@@ -41,29 +41,89 @@ export async function searchTopic(
 }
 
 /**
- * Search for company-specific news using domain filtering.
+ * Search for company-specific news.
+ *
+ * Strategy (two complementary searches):
+ *  1. Recent news search -- standard `type:"auto"` with date filter to get
+ *     fresh articles *about* the company.
+ *  2. Company profile search -- `category:"company"` (no date/domain filters
+ *     allowed by Exa for this category) to surface the company's own pages.
+ *
+ * If a domain is provided, a third domain-scoped search pulls content
+ * directly from the company's website.
  */
 export async function searchCompany(
   companyName: string,
-  daysBack: number = 7
+  daysBack: number = 7,
+  domain?: string
 ): Promise<SearchResult[]> {
-  const response = await exa.searchAndContents(
-    `${companyName} latest news announcements`,
-    {
-      type: 'auto',
-      numResults: 10,
-      text: true,
-      startPublishedDate: getDateNDaysAgo(daysBack),
-    }
-  );
+  const results: SearchResult[] = [];
+  const seen = new Set<string>();
 
-  return response.results.map((r) => ({
-    url: r.url,
-    title: r.title ?? 'Untitled',
-    text: r.text ?? '',
-    publishedDate: r.publishedDate ?? null,
-    source: extractDomain(r.url),
-  }));
+  const push = (r: { url: string; title?: string | null; text?: string | null; publishedDate?: string | null }) => {
+    if (seen.has(r.url)) return;
+    seen.add(r.url);
+    results.push({
+      url: r.url,
+      title: r.title ?? 'Untitled',
+      text: r.text ?? '',
+      publishedDate: r.publishedDate ?? null,
+      source: extractDomain(r.url),
+    });
+  };
+
+  // 1. Recent news about the company (date-filtered, standard search)
+  try {
+    const newsResponse = await exa.searchAndContents(
+      `${companyName} latest news announcements funding product launches`,
+      {
+        type: 'auto',
+        numResults: 10,
+        text: true,
+        startPublishedDate: getDateNDaysAgo(daysBack),
+      }
+    );
+    for (const r of newsResponse.results) push(r);
+  } catch (err) {
+    console.warn(`[Exa] News search failed for "${companyName}":`, err);
+  }
+
+  // 2. Company profile search (category:"company" -- no date filters allowed)
+  try {
+    const companyResponse = await exa.searchAndContents(
+      companyName,
+      {
+        type: 'auto',
+        category: 'company' as never,
+        numResults: 5,
+        text: true,
+      }
+    );
+    for (const r of companyResponse.results) push(r);
+  } catch (err) {
+    console.warn(`[Exa] Company category search failed for "${companyName}":`, err);
+  }
+
+  // 3. Domain-scoped search (content from the company's own website)
+  if (domain) {
+    try {
+      const domainResponse = await exa.searchAndContents(
+        `${companyName} news updates`,
+        {
+          type: 'auto',
+          numResults: 5,
+          text: true,
+          includeDomains: [domain],
+          startPublishedDate: getDateNDaysAgo(daysBack),
+        }
+      );
+      for (const r of domainResponse.results) push(r);
+    } catch (err) {
+      console.warn(`[Exa] Domain search failed for ${domain}:`, err);
+    }
+  }
+
+  return results;
 }
 
 function extractDomain(url: string): string {
