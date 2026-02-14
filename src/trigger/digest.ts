@@ -2,16 +2,24 @@ import { schedules } from '@trigger.dev/sdk/v3';
 import { eq, inArray } from 'drizzle-orm';
 import React from 'react';
 import { db } from '../db';
-import { articles, config, digests, feeds, topics } from '../db/schema';
+import { articles, companies, config, digests, feeds, topics } from '../db/schema';
 import { searchTopic, searchCompany, type SearchResult } from '../lib/exa';
 import { fetchRSSFeed } from '../lib/rss';
 import { summarizeArticles, type ArticleForSummary } from '../lib/agent';
 import { DigestEmail } from '../lib/email/digest-template';
 import { sendDigestEmail } from '../lib/resend';
 
+// Source tag so we know which table to store articles against
+interface TaggedResult extends SearchResult {
+  topicId?: string;
+  companyId?: string;
+}
+
 export const dailyDigest = schedules.task({
   id: 'daily-digest',
-  cron: '0 7 * * 1-5', // Weekday mornings at 7am UTC
+  // No hardcoded cron — the schedule is managed dynamically via the config
+  // server action which calls schedules.create() with the user's timezone
+  // and preferred delivery time.
   run: async (payload) => {
     console.log(`[Digest] Starting digest run at ${payload.timestamp.toISOString()}`);
 
@@ -28,16 +36,24 @@ export const dailyDigest = schedules.task({
       .from(topics)
       .where(eq(topics.isActive, true));
 
-    if (activeTopics.length === 0) {
-      console.log('[Digest] No active topics. Skipping.');
+    // 2b. Fetch all active companies
+    const activeCompanies = await db
+      .select()
+      .from(companies)
+      .where(eq(companies.isActive, true));
+
+    if (activeTopics.length === 0 && activeCompanies.length === 0) {
+      console.log('[Digest] No active topics or companies. Skipping.');
       return;
     }
 
-    console.log(`[Digest] Processing ${activeTopics.length} active topics`);
+    console.log(
+      `[Digest] Processing ${activeTopics.length} topics + ${activeCompanies.length} companies`
+    );
+
+    const allResults: TaggedResult[] = [];
 
     // 3. Search for each topic via Exa
-    const allResults: Array<SearchResult & { topicId: string }> = [];
-
     for (const topic of activeTopics) {
       try {
         let results: SearchResult[];
@@ -47,7 +63,7 @@ export const dailyDigest = schedules.task({
           results = await searchTopic(topic.searchQuery);
         }
 
-        console.log(`[Digest] Found ${results.length} results for "${topic.name}"`);
+        console.log(`[Digest] Found ${results.length} results for topic "${topic.name}"`);
 
         for (const r of results) {
           allResults.push({ ...r, topicId: topic.id });
@@ -57,7 +73,21 @@ export const dailyDigest = schedules.task({
       }
     }
 
-    // 3b. Also fetch from any RSS feeds linked to topics
+    // 3b. Search for each company
+    for (const company of activeCompanies) {
+      try {
+        const results = await searchCompany(company.name, 7, company.domain ?? undefined);
+        console.log(`[Digest] Found ${results.length} results for company "${company.name}"`);
+
+        for (const r of results) {
+          allResults.push({ ...r, companyId: company.id });
+        }
+      } catch (err) {
+        console.error(`[Digest] Error searching company "${company.name}":`, err);
+      }
+    }
+
+    // 3c. Also fetch from any RSS feeds linked to topics
     const allFeeds = await db.select().from(feeds);
     for (const feed of allFeeds) {
       try {
@@ -66,7 +96,6 @@ export const dailyDigest = schedules.task({
         for (const r of rssResults) {
           allResults.push({ ...r, topicId: feed.topicId });
         }
-        // Update last checked timestamp
         await db.update(feeds).set({ lastChecked: new Date() }).where(eq(feeds.id, feed.id));
       } catch (err) {
         console.error(`[Digest] Error fetching RSS feed ${feed.url}:`, err);
@@ -74,7 +103,7 @@ export const dailyDigest = schedules.task({
     }
 
     if (allResults.length === 0) {
-      console.log('[Digest] No results found across all topics. Skipping.');
+      console.log('[Digest] No results found across all sources. Skipping.');
       return;
     }
 
@@ -92,7 +121,7 @@ export const dailyDigest = schedules.task({
     const existingUrlSet = new Set(existingUrls.map((r) => r.url));
     const newResults = allResults.filter((r) => !existingUrlSet.has(r.url));
 
-    // Also dedup within the batch itself (same URL from multiple topics)
+    // Also dedup within the batch itself (same URL from multiple sources)
     const seenUrls = new Set<string>();
     const uniqueNewResults = newResults.filter((r) => {
       if (seenUrls.has(r.url)) return false;
@@ -113,7 +142,12 @@ export const dailyDigest = schedules.task({
     const capped = uniqueNewResults.slice(0, cfg.maxArticlesPerDigest);
 
     // 5. AI summarize & rank
-    const topicContext = activeTopics.map((t) => t.name).join(', ');
+    const contextParts = [
+      ...activeTopics.map((t) => t.name),
+      ...activeCompanies.map((c) => c.name),
+    ];
+    const topicContext = contextParts.join(', ');
+
     const articlesForSummary: ArticleForSummary[] = capped.map((r) => ({
       title: r.title,
       url: r.url,
@@ -128,7 +162,8 @@ export const dailyDigest = schedules.task({
     for (const result of capped) {
       try {
         await db.insert(articles).values({
-          topicId: result.topicId,
+          topicId: result.topicId ?? null,
+          companyId: result.companyId ?? null,
           url: result.url,
           title: result.title,
           summary:
@@ -155,11 +190,16 @@ export const dailyDigest = schedules.task({
       (a, b) => b.relevanceScore - a.relevanceScore
     );
 
+    const allTrackedNames = [
+      ...activeTopics.map((t) => t.name),
+      ...activeCompanies.map((c) => c.name),
+    ];
+
     const emailElement = React.createElement(DigestEmail, {
       executiveBriefing: digest.executiveBriefing,
       articles: sortedArticles,
       date: today,
-      topicNames: activeTopics.map((t) => t.name),
+      topicNames: allTrackedNames,
     });
 
     try {
