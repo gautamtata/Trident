@@ -20,7 +20,7 @@
  */
 
 import 'dotenv/config';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import React from 'react';
 import { db } from '../src/db';
 import { articles, companies, config, digests, topics } from '../src/db/schema';
@@ -141,11 +141,16 @@ async function main() {
     process.exit(0);
   }
 
-  // 5. Dedup
+  // 5. Dedup against articles already sent to this recipient
   const existingUrls = await db
     .select({ url: articles.url })
     .from(articles)
-    .where(inArray(articles.url, allResults.map((r) => r.url)));
+    .where(
+      and(
+        eq(articles.recipientEmail, cfg.email),
+        inArray(articles.url, allResults.map((r) => r.url))
+      )
+    );
 
   const existingUrlSet = new Set(existingUrls.map((r) => r.url));
   const seenUrls = new Set<string>();
@@ -190,6 +195,7 @@ async function main() {
       await db.insert(articles).values({
         topicId: result.topicId ?? null,
         companyId: result.companyId ?? null,
+        recipientEmail: cfg.email,
         url: result.url,
         title: result.title,
         summary: digest.articles.find((a) => a.url === result.url)?.summary ?? null,

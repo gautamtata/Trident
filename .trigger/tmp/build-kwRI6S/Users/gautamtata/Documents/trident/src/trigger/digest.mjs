@@ -25271,6 +25271,10 @@ __name(iife, "iife");
 
 // node_modules/drizzle-orm/pg-core/unique-constraint.js
 init_esm();
+function unique(name21) {
+  return new UniqueOnConstraintBuilder(name21);
+}
+__name(unique, "unique");
 function uniqueKeyName(table, columns) {
   return `${table[TableName]}_${columns.join("_")}_unique`;
 }
@@ -32751,13 +32755,16 @@ var articles = pgTable("articles", {
   id: uuid("id").defaultRandom().primaryKey(),
   topicId: uuid("topic_id").references(() => topics.id, { onDelete: "cascade" }),
   companyId: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }),
-  url: text("url").notNull().unique(),
+  recipientEmail: text("recipient_email").notNull(),
+  url: text("url").notNull(),
   title: text("title").notNull(),
   summary: text("summary"),
   source: text("source"),
   publishedAt: timestamp("published_at", { withTimezone: true }),
   foundAt: timestamp("found_at", { withTimezone: true }).notNull().defaultNow()
-});
+}, (table) => [
+  unique("articles_url_recipient_unique").on(table.url, table.recipientEmail)
+]);
 var digests = pgTable("digests", {
   id: uuid("id").defaultRandom().primaryKey(),
   sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
@@ -75382,9 +75389,12 @@ var dailyDigest = schedules_exports.task({
       return;
     }
     const existingUrls = await db.select({ url: articles.url }).from(articles).where(
-      inArray(
-        articles.url,
-        allResults.map((r) => r.url)
+      and(
+        eq(articles.recipientEmail, cfg.email),
+        inArray(
+          articles.url,
+          allResults.map((r) => r.url)
+        )
       )
     );
     const existingUrlSet = new Set(existingUrls.map((r) => r.url));
@@ -75423,6 +75433,7 @@ var dailyDigest = schedules_exports.task({
         await db.insert(articles).values({
           topicId: result.topicId ?? null,
           companyId: result.companyId ?? null,
+          recipientEmail: cfg.email,
           url: result.url,
           title: result.title,
           summary: digest.articles.find((a) => a.url === result.url)?.summary ?? null,

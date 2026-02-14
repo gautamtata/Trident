@@ -1,5 +1,5 @@
 import { schedules } from '@trigger.dev/sdk/v3';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import React from 'react';
 import { db } from '../db';
 import { articles, companies, config, digests, feeds, topics } from '../db/schema';
@@ -126,14 +126,17 @@ export const dailyDigest = schedules.task({
       return;
     }
 
-    // 4. Dedup against previously stored articles
+    // 4. Dedup against previously stored articles for this recipient
     const existingUrls = await db
       .select({ url: articles.url })
       .from(articles)
       .where(
-        inArray(
-          articles.url,
-          allResults.map((r) => r.url)
+        and(
+          eq(articles.recipientEmail, cfg.email),
+          inArray(
+            articles.url,
+            allResults.map((r) => r.url)
+          )
         )
       );
 
@@ -185,6 +188,7 @@ export const dailyDigest = schedules.task({
         await db.insert(articles).values({
           topicId: result.topicId ?? null,
           companyId: result.companyId ?? null,
+          recipientEmail: cfg.email,
           url: result.url,
           title: result.title,
           summary:

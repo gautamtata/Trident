@@ -1,4 +1,4 @@
-import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
 // Enums
 export const topicTypeEnum = pgEnum('topic_type', ['vertical', 'company', 'keyword']);
@@ -24,18 +24,21 @@ export const companies = pgTable('companies', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-// Articles - every result found and deduped by URL
+// Articles - every result found, deduped by URL per recipient email
 export const articles = pgTable('articles', {
   id: uuid('id').defaultRandom().primaryKey(),
   topicId: uuid('topic_id').references(() => topics.id, { onDelete: 'cascade' }),
   companyId: uuid('company_id').references(() => companies.id, { onDelete: 'cascade' }),
-  url: text('url').notNull().unique(),
+  recipientEmail: text('recipient_email').notNull(),
+  url: text('url').notNull(),
   title: text('title').notNull(),
   summary: text('summary'),
   source: text('source'),
   publishedAt: timestamp('published_at', { withTimezone: true }),
   foundAt: timestamp('found_at', { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  unique('articles_url_recipient_unique').on(table.url, table.recipientEmail),
+]);
 
 // Digests - history of sent email digests
 export const digests = pgTable('digests', {

@@ -59,7 +59,7 @@ drizzle.config.ts         # Drizzle Kit config (migrations, schema path)
 
 - **topics** -- what to track (vertical, company, or keyword + Exa search query)
 - **companies** -- companies to monitor (name + optional domain for domain-scoped search)
-- **articles** -- every result found, deduped by unique URL (FK to topics or companies)
+- **articles** -- every result found, deduped by (URL + recipientEmail) so each subscriber gets independent dedup (FK to topics or companies)
 - **feeds** -- RSS feed URLs linked to topics
 - **digests** -- history of sent email digests (status: sent/failed)
 - **config** -- single-row settings (email, timezone, delivery time, frequency, max articles)
