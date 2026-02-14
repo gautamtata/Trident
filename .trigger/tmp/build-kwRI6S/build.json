@@ -1,0 +1,120 @@
+{
+  "build": {
+  },
+  "cliPackageVersion": "4.3.3",
+  "config": {
+    "dirs": [
+      "./src/trigger"
+    ],
+    "project": "proj_asbqfkmwsnmspsuxvwds"
+  },
+  "configPath": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/trigger.config.mjs",
+  "contentHash": "399a6aec9bc755091dcfb406060be2ea",
+  "customConditions": [
+  ],
+  "deploy": {
+    "env": {
+    }
+  },
+  "environment": "dev",
+  "externals": [
+    {
+      "name": "import-in-the-middle",
+      "version": "1.11.0"
+    }
+  ],
+  "files": [
+    {
+      "entry": "src/trigger/digest.ts",
+      "out": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/src/trigger/digest.mjs"
+    }
+  ],
+  "indexWorkerEntryPoint": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-index-worker.mjs",
+  "otelImportHook": {
+    "include": [
+    ]
+  },
+  "outputHashes": {
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/src/trigger/digest.mjs": "x5fYCHuPaZE",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/src/trigger/digest.mjs.map": "qFFV+VBlIEI",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/trigger.config.mjs": "WT+2CF9KSAA",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/Users/gautamtata/Documents/trident/trigger.config.mjs.map": "xiuG6ajp4wY",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-365ZOKIB.mjs": "KsqfrcHuDjM",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-365ZOKIB.mjs.map": "hfVce8pu5HA",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-3G7FSQMB.mjs": "njot0XG8s3o",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-3G7FSQMB.mjs.map": "v56TatAvCVk",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-5OBYEN4V.mjs": "B13H6mYHdio",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-5OBYEN4V.mjs.map": "1KC6MWcuK3o",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-HBVYYMZ5.mjs": "zsLwPfZpIKM",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-HBVYYMZ5.mjs.map": "R9S/Ue+AEh4",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-HJWMQVLU.mjs": "jemMj288rnw",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-HJWMQVLU.mjs.map": "RKbKkpLyk4E",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-MILWGZJU.mjs": "ZJykmI2exdA",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-MILWGZJU.mjs.map": "TDSQ+4g1Wk0",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-P54PR2W2.mjs": "JK/XoknCOBk",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-P54PR2W2.mjs.map": "LMPzUuAiOIM",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-QRWCYGJZ.mjs": "kIvoJ/m0RrY",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-QRWCYGJZ.mjs.map": "W/NNYKNBewE",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-R2V5A4WW.mjs": "SJVJ6L9miEY",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-R2V5A4WW.mjs.map": "pvCLiOoJfuk",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-TNYYGMJN.mjs": "+oAZFttAk8k",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-TNYYGMJN.mjs.map": "DanREu2ttsI",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-ULLBNIVL.mjs": "rWWCRi6iC/Q",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/chunk-ULLBNIVL.mjs.map": "ExNMxtrKz4s",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/crypto.node-F7HMD4U7.mjs": "2gBJu0FOh9I",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/crypto.node-F7HMD4U7.mjs.map": "ElfdK+BbW5U",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/crypto.node-FWKKM4IM.mjs": "xPWhdJnw/pk",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/crypto.node-FWKKM4IM.mjs.map": "0b4tlwmkM3g",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/esm-33FWX6B4.mjs": "65lgo/32eiU",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/esm-33FWX6B4.mjs.map": "tKtzXsLjdu8",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/esm-V4U43X5R.mjs": "F3/55ZjqBGw",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/esm-V4U43X5R.mjs.map": "VON93E1In1A",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-bsd-IYVZPQB4.mjs": "X9tvW3+YR6E",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-bsd-IYVZPQB4.mjs.map": "s27GlwRqEa0",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-darwin-HQ6HEZQ4.mjs": "kvxS2H4IJ4w",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-darwin-HQ6HEZQ4.mjs.map": "0Q2nx8nmhLQ",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-linux-GB7ZWD3N.mjs": "0Zw/9fxj1ZA",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-linux-GB7ZWD3N.mjs.map": "kh4OHPVpXPs",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-unsupported-MAECNT5R.mjs": "XglHTQAcjDg",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-unsupported-MAECNT5R.mjs.map": "4nNGbwuny5o",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-win-SIL44OCS.mjs": "2fruKeDaqsk",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/getMachineId-win-SIL44OCS.mjs.map": "87em402T2Uw",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/node-PAFWI3DC.mjs": "rcRBTVm6ToI",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/node-PAFWI3DC.mjs.map": "69t3uW5pbZs",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-index-worker.mjs": "mtBbbKNEM2E",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-index-worker.mjs.map": "m2qwGkhjaZE",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs": "svNPBGn/Zw4",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs.map": "jL2eg+y0+ag",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/s2s-D55WWZJA.mjs": "w9jjC93W1Ks",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/s2s-D55WWZJA.mjs.map": "FQ9qEQMGD+o",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/server.node-XLBHENEE.mjs": "DrTOOhk2jd8",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/server.node-XLBHENEE.mjs.map": "2hcrhCeY4Q4",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/token-W62VDSNV.mjs": "Efwn3pH7xC0",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/token-W62VDSNV.mjs.map": "Tq2niETL4VI",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/token-util-RED6UKIP.mjs": "0yJjvtvnw7w",
+    "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/token-util-RED6UKIP.mjs.map": "0b4tlwmkM3g"
+  },
+  "outputPath": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S",
+  "packageVersion": "4.3.3",
+  "runWorkerEntryPoint": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-kwRI6S/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs",
+  "runtime": "node",
+  "sources": {
+    "package.json": {
+      "contentHash": "2bf9178a7f80b4e5c35698235b80f2d7",
+      "contents": "eJyNVMty2zAMvPsrNDqHkGgrju2TD/2DHjvNDCOiCmuJ1ACU4iSTf++Ioh51fehN2l3AwC6sz02SpFY1mJ6S1JPRaH36MIA9EhtnBzwHCfmItmR65Qe1pw4DxCWZ1nN6Sj43SZIkqcZ+qLJ49cnw/DDCL52p9UyMb5Fir8jP1PgWqdrYwCCHp4jql1NjKhonST1fE6Yy0y9ZRMFzukmSrzCgxhatRlsaXE15VkawvmSuRavM0OZ5Bzlsj9NvnAlV6QU2ytRZ6ZrWWbRhz/RZQg5Ps9CTqSok0NhnrC9BUcAOdpMi9t9DDof9BJa1Yha9IqNsiUJ1/tWR8e9BmsMTyEXJ14BuQS6odh5tP47zBLsVQebjo0bhqIm9iseFxasSvzm2K2Kug9FdaTSKsHQse9yv+CGaAZd7kDAv0VZBewB5WKSktLmKzkSrisWIubs8wvYGFto19yhGq6N9R9jOOLNoFTFSjE7ulgG8MvWbsVo0SBVGwWqXD6fnkPbrQ+m/3b+VqWHJnLWOfcmjg8XdG5gv/e8rOPv3FjmzTo8jbfMbZjFzD7fckos83qMm91b0dAcXMwW6kzCz8Q81EDeYKJ39ZSpxP3F+Vbq00dMDFLee/2ONj8dbwFauInoTyppGeRRThVxHFFYLX5bAPS4pmco6wu/zV+fHPBe1U3VniQUhu7pHGkp/hlJPHXvUNyH/X4PN1+YPA2JZbQ=="
+    },
+    "src/trigger/digest.ts": {
+      "contentHash": "48833c6c2a2cb8c7d0137d3d1970d269",
+      "contents": "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"
+    },
+    "trigger.config.ts": {
+      "contentHash": "5e9aad6dd70b45ad77c57c2a1d940072",
+      "contents": "eJxVkEFrwzAMhe/5FQ+fNghNRigM97KxXgrbbbcxilsrwWtsZ7KcFkr/+0hoGb1I4nvSk5DzQ2TBGZZaF+gthtZ1uKDl6KFehF3XES8sjVWyh2ps1Koo6DQPWWpN7uVu9OFcAAPHH9qLhpqqrUm73/bgjyn4NKR8Go82qbIAOAdxnjRUiJZm1MfunUbqNVQfuxl5c1pnNuJi0GjqukRVYQnvQhZKk4yBGGLSYXKcfEnYUdKYjgEomF1PdhPWNGoIZypnfr3/1jZvehUhP0jSaMorbc1eIms8LZ5vyLvw6TzFLJvwkTSWdV3+e9xJTb2tb+plSnOwjpPGl1pUiffV9cvquywuj6viDx7CfPI="
+    },
+    "tsconfig.json": {
+      "contentHash": "ee17fd1c97c735e9f3564e3f5251f125",
+      "contents": "eJxtUU1Lw0AQvedXLHMMbaJehJ4E6cFiEfRYimyyQ7t2v9id1EjJf5fdJNVET8O8N2/2vdlLxhjUVjup0L84ktYEWLFLxhhjQNwfkGDFYP12d3N7D4seV7KCFduBsBoWLJZCEnpeKYw9BoMtwX6Y5krZz01cS77BAQwn6Z5l9XjE+jRjyMuappixay1nGIatFY3CJ0PorZuSOlHR+WBmgr9isKqJYeNE1Rih0I8jPpJn3ARrtuOWX5tlsIoTip6bpfoIbdzokde0jM0oMrVHjYa4mgqcag4ynXyXADacvk/NdYqQAgxwl+p4Wsfp+PNfjMFDmaefKcrg6zKHfTaKuiiJRlQj8Ppe2r1Ecy5EQWG0m+dl/re9pimiqKQvh6GcjfaUwPP/dGo1hZgmZQBsr4bAWIHverjrPuuyb0p5toA="
+    }
+  },
+  "target": "dev"
+}

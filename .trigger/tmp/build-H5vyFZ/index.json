@@ -1,0 +1,28 @@
+{
+  "configPath": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-H5vyFZ/Users/gautamtata/Documents/trident/trigger.config.mjs",
+  "customConditions": [
+  ],
+  "queues": [
+  ],
+  "runtime": "node",
+  "runtimeVersion": "22.17.0",
+  "tasks": [
+    {
+      "entryPoint": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-H5vyFZ/Users/gautamtata/Documents/trident/src/trigger/digest.mjs",
+      "filePath": "src/trigger/digest.ts",
+      "id": "daily-digest",
+      "maxDuration": 300,
+      "retry": {
+        "factor": 1.8,
+        "maxAttempts": 3,
+        "maxTimeoutInMs": 30000,
+        "minTimeoutInMs": 500
+      },
+      "triggerSource": "schedule"
+    }
+  ],
+  "timings": {
+    "src/trigger/digest.ts": 48.802291999999994
+  },
+  "workerEntryPoint": "/Users/gautamtata/Documents/trident/.trigger/tmp/build-H5vyFZ/private/tmp/bunx-501-trigger.dev@latest/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs"
+}
