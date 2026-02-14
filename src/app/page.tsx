@@ -1,9 +1,13 @@
 import { Separator } from '@/components/ui/separator';
 import { TopicForm } from '@/components/topic-form';
 import { TopicList } from '@/components/topic-list';
+import { CompanyForm } from '@/components/company-form';
+import { CompanyList } from '@/components/company-list';
 import { ConfigForm } from '@/components/config-form';
+import { SendDigestButton } from '@/components/send-digest-button';
 import { DigestHistory } from '@/components/digest-history';
 import { getTopics } from '@/app/actions/topics';
+import { getCompanies } from '@/app/actions/companies';
 import { getConfig } from '@/app/actions/config';
 import { getDigests } from '@/app/actions/digests';
 
@@ -11,8 +15,9 @@ import { getDigests } from '@/app/actions/digests';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const [topicsData, configData, digestsData] = await Promise.all([
+  const [topicsData, companiesData, configData, digestsData] = await Promise.all([
     getTopics(),
+    getCompanies(),
     getConfig(),
     getDigests(),
   ]);
@@ -31,13 +36,26 @@ export default async function Home() {
                 AI-powered industry intelligence digests
               </p>
             </div>
-            <TopicForm />
+            <div className="flex items-center gap-2">
+              <CompanyForm />
+              <TopicForm />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-6 py-8 space-y-8">
+        {/* Companies Section */}
+        <section>
+          <h2 className="text-lg font-semibold text-zinc-900 mb-4">
+            Companies ({companiesData.length})
+          </h2>
+          <CompanyList companies={companiesData} />
+        </section>
+
+        <Separator />
+
         {/* Topics Section */}
         <section>
           <h2 className="text-lg font-semibold text-zinc-900 mb-4">
@@ -51,8 +69,9 @@ export default async function Home() {
         {/* Two column layout for config and digests */}
         <div className="grid gap-8 md:grid-cols-2">
           {/* Config */}
-          <section>
+          <section className="space-y-4">
             <ConfigForm config={configData} />
+            <SendDigestButton />
           </section>
 
           {/* Digest History */}
