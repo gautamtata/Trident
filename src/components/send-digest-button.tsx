@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { sendDigestNow } from '@/app/actions/send-digest';
@@ -31,8 +32,9 @@ export function SendDigestButton() {
       onClick={handleClick}
       disabled={loading}
       variant="outline"
-      className="w-full min-h-[44px]"
+      className="w-full min-h-[44px] cursor-pointer"
     >
+      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       {loading ? 'Sending digest...' : 'Send Test Digest Now'}
     </Button>
   );

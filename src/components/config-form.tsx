@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -220,7 +221,8 @@ export function ConfigForm({ config }: { config: Config | null }) {
             />
           </div>
 
-          <Button type="submit" className="w-full min-h-[44px]" disabled={saving}>
+          <Button type="submit" className="w-full min-h-[44px] cursor-pointer" disabled={saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {saving ? 'Saving...' : config ? 'Update Settings' : 'Save Settings'}
           </Button>
         </form>
