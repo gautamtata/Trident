@@ -3,9 +3,9 @@ import { eq, inArray } from 'drizzle-orm';
 import React from 'react';
 import { db } from '../db';
 import { articles, companies, config, digests, feeds, topics } from '../db/schema';
-import { searchTopic, searchCompany, type SearchResult } from '../lib/exa';
+import { type SearchResult } from '../lib/exa';
 import { fetchRSSFeed } from '../lib/rss';
-import { summarizeArticles, type ArticleForSummary } from '../lib/agent';
+import { createResearchAgent, summarizeArticles, type ArticleForSummary } from '../lib/agent';
 import { DigestEmail } from '../lib/email/digest-template';
 import { sendDigestEmail } from '../lib/resend';
 
@@ -30,13 +30,12 @@ export const dailyDigest = schedules.task({
       return;
     }
 
-    // 2. Fetch all active topics
+    // 2. Fetch all active topics and companies
     const activeTopics = await db
       .select()
       .from(topics)
       .where(eq(topics.isActive, true));
 
-    // 2b. Fetch all active companies
     const activeCompanies = await db
       .select()
       .from(companies)
@@ -51,43 +50,63 @@ export const dailyDigest = schedules.task({
       `[Digest] Processing ${activeTopics.length} topics + ${activeCompanies.length} companies`
     );
 
-    const allResults: TaggedResult[] = [];
+    // 3. Research each topic and company using AI agents (parallel)
+    //    Each agent decomposes the topic into targeted sub-queries and
+    //    searches Exa 2-4 times with a stepCountIs(5) budget.
+    const researchPromises = [
+      // Topic research
+      ...activeTopics.map(async (topic): Promise<TaggedResult[]> => {
+        try {
+          const { agent, collectedResults } = createResearchAgent();
 
-    // 3. Search for each topic via Exa
-    for (const topic of activeTopics) {
-      try {
-        let results: SearchResult[];
-        if (topic.type === 'company') {
-          results = await searchCompany(topic.searchQuery);
-        } else {
-          results = await searchTopic(topic.searchQuery);
+          const prompt =
+            topic.type === 'company'
+              ? `Research the company "${topic.name}". Find recent news, product launches, funding, and competitive developments. Search query hint: ${topic.searchQuery}`
+              : `Research the topic "${topic.name}". Find the most important recent developments, breakthroughs, and news. Search query hint: ${topic.searchQuery}`;
+
+          await agent.generate({ prompt });
+
+          console.log(
+            `[Digest] Agent found ${collectedResults.length} results for topic "${topic.name}"`
+          );
+          return collectedResults.map((r) => ({ ...r, topicId: topic.id }));
+        } catch (err) {
+          console.error(`[Digest] Error researching topic "${topic.name}":`, err);
+          return [];
         }
+      }),
 
-        console.log(`[Digest] Found ${results.length} results for topic "${topic.name}"`);
+      // Company research
+      ...activeCompanies.map(async (company): Promise<TaggedResult[]> => {
+        try {
+          const { agent, collectedResults } = createResearchAgent();
 
-        for (const r of results) {
-          allResults.push({ ...r, topicId: topic.id });
+          const domainHint = company.domain
+            ? ` Their website is ${company.domain}.`
+            : '';
+
+          await agent.generate({
+            prompt: `Research the company "${company.name}".${domainHint} Find recent news, announcements, product launches, funding rounds, and strategic developments.`,
+          });
+
+          console.log(
+            `[Digest] Agent found ${collectedResults.length} results for company "${company.name}"`
+          );
+          return collectedResults.map((r) => ({ ...r, companyId: company.id }));
+        } catch (err) {
+          console.error(
+            `[Digest] Error researching company "${company.name}":`,
+            err
+          );
+          return [];
         }
-      } catch (err) {
-        console.error(`[Digest] Error searching topic "${topic.name}":`, err);
-      }
-    }
+      }),
+    ];
 
-    // 3b. Search for each company
-    for (const company of activeCompanies) {
-      try {
-        const results = await searchCompany(company.name, 7, company.domain ?? undefined);
-        console.log(`[Digest] Found ${results.length} results for company "${company.name}"`);
+    const researchResults = await Promise.all(researchPromises);
+    const allResults: TaggedResult[] = researchResults.flat();
 
-        for (const r of results) {
-          allResults.push({ ...r, companyId: company.id });
-        }
-      } catch (err) {
-        console.error(`[Digest] Error searching company "${company.name}":`, err);
-      }
-    }
-
-    // 3c. Also fetch from any RSS feeds linked to topics
+    // 3b. Also fetch from any RSS feeds linked to topics
     const allFeeds = await db.select().from(feeds);
     for (const feed of allFeeds) {
       try {
@@ -141,7 +160,7 @@ export const dailyDigest = schedules.task({
     // Cap to max articles per digest
     const capped = uniqueNewResults.slice(0, cfg.maxArticlesPerDigest);
 
-    // 5. AI summarize & rank
+    // 5. AI summarize & rank (structured output)
     const contextParts = [
       ...activeTopics.map((t) => t.name),
       ...activeCompanies.map((c) => c.name),
@@ -153,9 +172,11 @@ export const dailyDigest = schedules.task({
       url: r.url,
       source: r.source,
       text: r.text,
+      highlights: r.highlights,
+      exaSummary: r.exaSummary,
     }));
 
-    console.log('[Digest] Summarizing articles with AI...');
+    console.log('[Digest] Summarizing articles with AI (structured output)...');
     const digest = await summarizeArticles(articlesForSummary, topicContext);
 
     // 6. Store new articles in DB

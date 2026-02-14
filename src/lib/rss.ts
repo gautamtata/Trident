@@ -25,6 +25,8 @@ export async function fetchRSSFeed(
       url: item.link ?? '',
       title: item.title ?? 'Untitled',
       text: item.contentSnippet ?? item.content ?? '',
+      highlights: [],
+      exaSummary: null,
       publishedDate: item.isoDate ?? item.pubDate ?? null,
       source: extractDomain(feedUrl),
     }));
