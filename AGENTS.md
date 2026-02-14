@@ -14,6 +14,7 @@ AI-powered industry intelligence digests. Searches the web, summarizes with AI, 
 - **Tailwind CSS v4** + **shadcn/ui** (`radix-ui`) -- dashboard components
 - **rss-parser** -- optional RSS feed ingestion
 - **Zod v4** -- schema validation for AI tool inputs
+- **Bun and Bunx** -- Package manager
 
 ## Project Structure
 
