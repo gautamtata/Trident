@@ -37,25 +37,26 @@ export function TopicForm() {
       <DialogTrigger asChild>
         <Button>Add Topic</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px] max-w-[calc(100vw-2rem)]">
         <DialogHeader>
-          <DialogTitle>Add a new topic to track</DialogTitle>
+          <DialogTitle className="text-base md:text-lg">Add a new topic to track</DialogTitle>
         </DialogHeader>
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-sm">Name</Label>
             <Input
               id="name"
               name="name"
               placeholder="e.g., Robotics Industry"
+              className="min-h-[44px]"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Type</Label>
+            <Label className="text-sm">Type</Label>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger>
+              <SelectTrigger className="min-h-[44px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -67,11 +68,12 @@ export function TopicForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="searchQuery">Search Query</Label>
+            <Label htmlFor="searchQuery" className="text-sm">Search Query</Label>
             <Input
               id="searchQuery"
               name="searchQuery"
               placeholder="e.g., latest robotics industry news and developments"
+              className="min-h-[44px]"
               required
             />
             <p className="text-xs text-muted-foreground">
@@ -79,7 +81,7 @@ export function TopicForm() {
             </p>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full min-h-[44px]">
             Create Topic
           </Button>
         </form>

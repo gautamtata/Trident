@@ -29,42 +29,85 @@ export function DigestHistory({ digests }: { digests: Digest[] }) {
             No digests sent yet. They will appear here after the first scheduled run.
           </p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Recipient</TableHead>
-                <TableHead className="text-center">Articles</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile card layout */}
+            <div className="md:hidden space-y-3">
               {digests.map((digest) => (
-                <TableRow key={digest.id}>
-                  <TableCell className="text-sm">
-                    {new Date(digest.sentAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </TableCell>
-                  <TableCell className="text-sm">{digest.recipientEmail}</TableCell>
-                  <TableCell className="text-center text-sm">
-                    {digest.articleCount}
-                  </TableCell>
-                  <TableCell className="text-center">
+                <div
+                  key={digest.id}
+                  className="border rounded-lg p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      {new Date(digest.sentAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
                     <Badge
                       variant={digest.status === 'sent' ? 'default' : 'destructive'}
+                      className="text-xs"
                     >
                       {digest.status}
                     </Badge>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(digest.sentAt).toLocaleTimeString('en-US', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                  <div className="text-xs text-muted-foreground break-all">
+                    {digest.recipientEmail}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {digest.articleCount} articles
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+
+            {/* Desktop table layout */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Recipient</TableHead>
+                    <TableHead className="text-center">Articles</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {digests.map((digest) => (
+                    <TableRow key={digest.id}>
+                      <TableCell className="text-sm">
+                        {new Date(digest.sentAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
+                      <TableCell className="text-sm">{digest.recipientEmail}</TableCell>
+                      <TableCell className="text-center text-sm">
+                        {digest.articleCount}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={digest.status === 'sent' ? 'default' : 'destructive'}
+                        >
+                          {digest.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

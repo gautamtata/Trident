@@ -31,7 +31,7 @@ export function SendDigestButton() {
       onClick={handleClick}
       disabled={loading}
       variant="outline"
-      className="w-full"
+      className="w-full min-h-[44px]"
     >
       {loading ? 'Sending digest...' : 'Send Test Digest Now'}
     </Button>

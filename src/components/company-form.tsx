@@ -28,17 +28,18 @@ export function CompanyForm() {
       <DialogTrigger asChild>
         <Button variant="outline">Add Company</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px] max-w-[calc(100vw-2rem)]">
         <DialogHeader>
-          <DialogTitle>Track a company</DialogTitle>
+          <DialogTitle className="text-base md:text-lg">Track a company</DialogTitle>
         </DialogHeader>
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Company Name</Label>
+            <Label htmlFor="name" className="text-sm">Company Name</Label>
             <Input
               id="name"
               name="name"
               placeholder="e.g. Boston Dynamics"
+              className="min-h-[44px]"
               required
             />
             <p className="text-xs text-muted-foreground">
@@ -47,18 +48,19 @@ export function CompanyForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="domain">Website (optional)</Label>
+            <Label htmlFor="domain" className="text-sm">Website (optional)</Label>
             <Input
               id="domain"
               name="domain"
               placeholder="e.g. bostondynamics.com"
+              className="min-h-[44px]"
             />
             <p className="text-xs text-muted-foreground">
               Adding the website helps us find updates directly from the company.
             </p>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full min-h-[44px]">
             Start Tracking
           </Button>
         </form>

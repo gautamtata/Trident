@@ -29,25 +29,26 @@ export function TopicList({ topics }: { topics: Topic[] }) {
     <div className="space-y-3">
       {topics.map((topic) => (
         <Card key={topic.id} className={topic.isActive ? '' : 'opacity-50'}>
-          <CardContent className="flex items-center justify-between py-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{topic.name}</span>
-                <Badge variant={topic.isActive ? 'default' : 'secondary'}>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between py-3 md:py-4 gap-3">
+            <div className="space-y-1 min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-medium text-sm md:text-base wrap-break-word">{topic.name}</span>
+                <Badge variant={topic.isActive ? 'default' : 'secondary'} className="text-xs">
                   {topic.type}
                 </Badge>
                 {!topic.isActive && (
-                  <Badge variant="outline">Paused</Badge>
+                  <Badge variant="outline" className="text-xs">Paused</Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground wrap-break-word">
                 Query: &ldquo;{topic.searchQuery}&rdquo;
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:shrink-0">
               <Button
                 variant="outline"
                 size="sm"
+                className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0"
                 onClick={() => toggleTopic(topic.id, !topic.isActive)}
               >
                 {topic.isActive ? 'Pause' : 'Resume'}
@@ -55,6 +56,7 @@ export function TopicList({ topics }: { topics: Topic[] }) {
               <Button
                 variant="destructive"
                 size="sm"
+                className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0"
                 onClick={() => deleteTopic(topic.id)}
               >
                 Delete

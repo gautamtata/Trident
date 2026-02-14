@@ -138,9 +138,9 @@ export function ConfigForm({ config }: { config: Config | null }) {
             </Select>
 
             {/* Time picker row */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Select value={hour} onValueChange={setHour}>
-                <SelectTrigger className="w-[80px]">
+                <SelectTrigger className="w-[70px] sm:w-[80px] min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,7 +155,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
               <span className="text-muted-foreground font-medium">:</span>
 
               <Select value={minute} onValueChange={setMinute}>
-                <SelectTrigger className="w-[80px]">
+                <SelectTrigger className="w-[70px] sm:w-[80px] min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -168,7 +168,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
               </Select>
 
               <Select value={ampm} onValueChange={(v) => setAmpm(v as 'AM' | 'PM')}>
-                <SelectTrigger className="w-[80px]">
+                <SelectTrigger className="w-[70px] sm:w-[80px] min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -179,7 +179,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
             </div>
 
             {/* Frequency */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {(
                 [
                   { value: 'daily', label: 'Every day' },
@@ -191,7 +191,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
                   key={opt.value}
                   type="button"
                   onClick={() => setFrequency(opt.value)}
-                  className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`flex-1 sm:flex-none rounded-md border px-3 py-2 sm:py-1.5 text-sm font-medium transition-colors min-h-[44px] sm:min-h-0 ${
                     frequency === opt.value
                       ? 'border-zinc-900 bg-zinc-900 text-white'
                       : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
@@ -202,7 +202,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
               ))}
             </div>
 
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs sm:text-xs text-muted-foreground wrap-break-word">
               Digest delivered at {hour}:{String(minute).padStart(2, '0')} {ampm} {frequencyLabel} ({TIMEZONES.find((t) => t.value === timezone)?.label ?? timezone})
             </p>
           </div>
@@ -220,7 +220,7 @@ export function ConfigForm({ config }: { config: Config | null }) {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={saving}>
+          <Button type="submit" className="w-full min-h-[44px]" disabled={saving}>
             {saving ? 'Saving...' : config ? 'Update Settings' : 'Save Settings'}
           </Button>
         </form>
