@@ -8,7 +8,7 @@ export async function sendDigestEmail(
   reactElement: React.ReactElement
 ) {
   const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? 'Industry Deep Search <onboarding@resend.dev>',
+    from: process.env.RESEND_FROM_EMAIL ?? 'Industry Deep Search <digest@updates.roboticssearchengine.com>',
     to: [to],
     subject,
     react: reactElement,
