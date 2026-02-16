@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -226,11 +227,12 @@ function TopicCard({ topic }: { topic: Topic }) {
 
             <div className="space-y-2">
               <Label htmlFor={`edit-query-${topic.id}`} className="text-sm">Search Query</Label>
-              <Input
+              <Textarea
                 id={`edit-query-${topic.id}`}
                 value={editQuery}
                 onChange={(e) => setEditQuery(e.target.value)}
-                className="min-h-[44px]"
+                className="min-h-[88px] resize-y text-sm"
+                rows={3}
                 required
               />
               <p className="text-xs text-muted-foreground">
