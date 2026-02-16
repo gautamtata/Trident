@@ -169,7 +169,7 @@ export async function sendDigestNow(): Promise<{ success: boolean; message: stri
   });
 
   try {
-    await sendDigestEmail(cfg.email, `Trident Digest — ${today}`, emailElement);
+    await sendDigestEmail(cfg.email, `Industry Deep Search — Digest — ${today}`, emailElement);
 
     await db.insert(digests).values({
       recipientEmail: cfg.email,

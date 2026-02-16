@@ -37,13 +37,13 @@ export function DigestEmail({
     <Html>
       <Head />
       <Preview>
-        Trident Intelligence Digest — {date}
+        Industry Deep Search — Digest — {date}
       </Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Text style={logoText}>TRIDENT</Text>
+            <Text style={logoText}>INDUSTRY DEEP SEARCH</Text>
             <Text style={tagline}>Industry Intelligence Digest</Text>
           </Section>
 
@@ -92,7 +92,7 @@ export function DigestEmail({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              Powered by Trident — AI-first industry intelligence.
+              Powered by Industry Deep Search — AI-first industry intelligence.
             </Text>
           </Section>
         </Container>

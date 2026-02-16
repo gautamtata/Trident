@@ -33,6 +33,23 @@ export async function toggleTopic(id: string, isActive: boolean) {
   revalidatePath('/');
 }
 
+export async function updateTopic(
+  id: string,
+  data: { name: string; type: 'vertical' | 'company' | 'keyword'; searchQuery: string },
+) {
+  if (!data.name?.trim() || !data.searchQuery?.trim()) {
+    return { error: 'Name and search query are required' };
+  }
+
+  await db
+    .update(topics)
+    .set({ name: data.name.trim(), type: data.type, searchQuery: data.searchQuery.trim() })
+    .where(eq(topics.id, id));
+
+  revalidatePath('/');
+  return { success: true };
+}
+
 export async function deleteTopic(id: string) {
   await db.delete(topics).where(eq(topics.id, id));
   revalidatePath('/');

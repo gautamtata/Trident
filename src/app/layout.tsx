@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trident — AI Industry Intelligence",
+  title: "Industry Deep Search — AI Industry Intelligence",
   description: "AI-powered industry intelligence digests delivered to your inbox",
   viewport: {
     width: "device-width",

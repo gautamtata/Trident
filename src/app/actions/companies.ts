@@ -39,6 +39,31 @@ export async function toggleCompany(id: string, isActive: boolean) {
   revalidatePath('/');
 }
 
+export async function updateCompany(
+  id: string,
+  data: { name: string; domain: string | null },
+) {
+  if (!data.name?.trim()) {
+    return { error: 'Company name is required' };
+  }
+
+  let domain = data.domain?.trim() || null;
+  if (domain) {
+    domain = domain
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .replace(/\/+$/, '');
+  }
+
+  await db
+    .update(companies)
+    .set({ name: data.name.trim(), domain })
+    .where(eq(companies.id, id));
+
+  revalidatePath('/');
+  return { success: true };
+}
+
 export async function deleteCompany(id: string) {
   await db.delete(companies).where(eq(companies.id, id));
   revalidatePath('/');

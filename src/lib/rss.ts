@@ -4,7 +4,7 @@ import type { SearchResult } from './exa';
 const parser = new Parser({
   timeout: 10000,
   headers: {
-    'User-Agent': 'Trident/1.0 (RSS Reader)',
+    'User-Agent': 'IndustryDeepSearch/1.0 (RSS Reader)',
   },
 });
 

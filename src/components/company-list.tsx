@@ -1,11 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MoreVertical, Pencil, Pause, Play, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { toggleCompany, deleteCompany } from '@/app/actions/companies';
+import { toggleCompany, deleteCompany, updateCompany } from '@/app/actions/companies';
 
 interface Company {
   id: string;
@@ -29,15 +44,22 @@ interface Company {
 function CompanyCard({ company }: { company: Company }) {
   const [loadingToggle, setLoadingToggle] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showPauseDialog, setShowPauseDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+
+  const [editName, setEditName] = useState(company.name);
+  const [editDomain, setEditDomain] = useState(company.domain ?? '');
+
+  const isLoading = loadingToggle || loadingDelete || loadingEdit;
 
   async function handleToggle() {
     setLoadingToggle(true);
     try {
       await toggleCompany(company.id, !company.isActive);
       toast.success(company.isActive ? 'Company paused' : 'Company resumed');
-    } catch (err) {
+    } catch {
       toast.error(`Failed to ${company.isActive ? 'pause' : 'resume'} company`);
     } finally {
       setLoadingToggle(false);
@@ -50,7 +72,7 @@ function CompanyCard({ company }: { company: Company }) {
     try {
       await deleteCompany(company.id);
       toast.success('Company deleted');
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete company');
     } finally {
       setLoadingDelete(false);
@@ -58,10 +80,36 @@ function CompanyCard({ company }: { company: Company }) {
     }
   }
 
+  async function handleEdit() {
+    setLoadingEdit(true);
+    try {
+      const result = await updateCompany(company.id, {
+        name: editName,
+        domain: editDomain || null,
+      });
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success('Company updated');
+      setShowEditDialog(false);
+    } catch {
+      toast.error('Failed to update company');
+    } finally {
+      setLoadingEdit(false);
+    }
+  }
+
+  function openEditDialog() {
+    setEditName(company.name);
+    setEditDomain(company.domain ?? '');
+    setShowEditDialog(true);
+  }
+
   return (
     <>
       <Card className={company.isActive ? '' : 'opacity-50'}>
-        <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between py-3 md:py-4 gap-3">
+        <CardContent className="flex items-center justify-between py-3 md:py-4 gap-3">
           <div className="space-y-1 min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-sm md:text-base wrap-break-word">{company.name}</span>
@@ -74,37 +122,106 @@ function CompanyCard({ company }: { company: Company }) {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0 cursor-pointer"
-              onClick={() => setShowPauseDialog(true)}
-              disabled={loadingToggle || loadingDelete}
-            >
-              {loadingToggle ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                company.isActive ? 'Pause' : 'Resume'
-              )}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0 cursor-pointer"
-              onClick={() => setShowDeleteDialog(true)}
-              disabled={loadingToggle || loadingDelete}
-            >
-              {loadingDelete ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Delete'
-              )}
-            </Button>
-          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 cursor-pointer"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MoreVertical className="h-4 w-4" />
+                )}
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={openEditDialog} className="cursor-pointer">
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowPauseDialog(true)}
+                className="cursor-pointer"
+              >
+                {company.isActive ? (
+                  <>
+                    <Pause className="mr-2 h-4 w-4" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    Resume
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive cursor-pointer"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardContent>
       </Card>
 
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[425px] max-w-[calc(100vw-2rem)]">
+          <DialogHeader>
+            <DialogTitle className="text-base md:text-lg">Edit company</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleEdit();
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor={`edit-name-${company.id}`} className="text-sm">Company Name</Label>
+              <Input
+                id={`edit-name-${company.id}`}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="min-h-[44px]"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`edit-domain-${company.id}`} className="text-sm">
+                Website (optional)
+              </Label>
+              <Input
+                id={`edit-domain-${company.id}`}
+                value={editDomain}
+                onChange={(e) => setEditDomain(e.target.value)}
+                placeholder="e.g. bostondynamics.com"
+                className="min-h-[44px]"
+              />
+              <p className="text-xs text-muted-foreground">
+                Adding the website helps us find updates directly from the company.
+              </p>
+            </div>
+
+            <Button type="submit" className="w-full min-h-[44px]" disabled={loadingEdit}>
+              {loadingEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Changes
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pause/Resume Dialog */}
       <AlertDialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -115,7 +232,7 @@ function CompanyCard({ company }: { company: Company }) {
               {company.isActive
                 ? `"${company.name}" will stop appearing in digests until you resume it.`
                 : `"${company.name}" will start appearing in digests again.`}
-              </AlertDialogDescription>
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loadingToggle}>Cancel</AlertDialogCancel>
@@ -131,6 +248,7 @@ function CompanyCard({ company }: { company: Company }) {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Delete Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

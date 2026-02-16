@@ -32806,7 +32806,7 @@ var import_rss_parser = __toESM(require_rss_parser());
 var parser = new import_rss_parser.default({
   timeout: 1e4,
   headers: {
-    "User-Agent": "Trident/1.0 (RSS Reader)"
+    "User-Agent": "IndustryDeepSearch/1.0 (RSS Reader)"
   }
 });
 async function fetchRSSFeed(feedUrl, maxItems = 10) {
@@ -70148,7 +70148,7 @@ function DigestEmail({
       columnNumber: 7
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Preview, { children: [
-      "Trident Intelligence Digest — ",
+      "Industry Deep Search — Digest — ",
       date6
     ] }, void 0, true, {
       fileName: "src/lib/email/digest-template.tsx",
@@ -70157,7 +70157,7 @@ function DigestEmail({
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Body, { style: main, children: /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Container, { style: container, children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Section, { style: header, children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Text, { style: logoText, children: "TRIDENT" }, void 0, false, {
+        /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Text, { style: logoText, children: "INDUSTRY DEEP SEARCH" }, void 0, false, {
           fileName: "src/lib/email/digest-template.tsx",
           lineNumber: 46,
           columnNumber: 13
@@ -70271,7 +70271,7 @@ function DigestEmail({
         lineNumber: 90,
         columnNumber: 11
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Section, { style: footer, children: /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Text, { style: footerText, children: "Powered by Trident — AI-first industry intelligence." }, void 0, false, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Section, { style: footer, children: /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Text, { style: footerText, children: "Powered by Industry Deep Search — AI-first industry intelligence." }, void 0, false, {
         fileName: "src/lib/email/digest-template.tsx",
         lineNumber: 94,
         columnNumber: 13
@@ -75297,7 +75297,7 @@ var Resend = class {
 var resend = new Resend(process.env.RESEND_API_KEY);
 async function sendDigestEmail(to, subject, reactElement) {
   const { data, error: error48 } = await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? "Trident <onboarding@resend.dev>",
+    from: process.env.RESEND_FROM_EMAIL ?? "Industry Deep Search <onboarding@resend.dev>",
     to: [to],
     subject,
     react: reactElement
@@ -75466,7 +75466,7 @@ var dailyDigest = schedules_exports.task({
     try {
       await sendDigestEmail(
         cfg.email,
-        `Trident Digest — ${today}`,
+        `Industry Deep Search — Digest — ${today}`,
         emailElement
       );
       await db.insert(digests).values({

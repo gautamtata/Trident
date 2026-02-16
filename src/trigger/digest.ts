@@ -230,7 +230,7 @@ export const dailyDigest = schedules.task({
     try {
       await sendDigestEmail(
         cfg.email,
-        `Trident Digest — ${today}`,
+        `Industry Deep Search — Digest — ${today}`,
         emailElement
       );
 

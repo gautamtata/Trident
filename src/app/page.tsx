@@ -30,7 +30,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div>
               <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900">
-                Trident
+                Industry Deep Search
               </h1>
               <p className="text-xs md:text-sm text-zinc-500">
                 AI-powered industry intelligence digests
