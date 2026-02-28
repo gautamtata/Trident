@@ -47,6 +47,7 @@ export const digests = pgTable('digests', {
   recipientEmail: text('recipient_email').notNull(),
   articleCount: integer('article_count').notNull().default(0),
   status: digestStatusEnum('status').notNull().default('sent'),
+  error: text('error'),
 });
 
 // RSS Feeds - optional RSS sources linked to topics

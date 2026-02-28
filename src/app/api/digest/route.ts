@@ -231,17 +231,19 @@ async function handler(_req: Request) {
     console.log(`[Digest] Successfully sent digest with ${sortedArticles.length} articles to ${recipients.join(', ')}`);
     return new Response(`Sent ${sortedArticles.length} articles to ${recipients.join(', ')}`, { status: 200 });
   } catch (err) {
-    console.error('[Digest] Failed to send email:', err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('[Digest] Failed to send email:', errorMessage);
 
     for (const recipientEmail of recipients) {
       await db.insert(digests).values({
         recipientEmail,
         articleCount: sortedArticles.length,
         status: 'failed',
+        error: errorMessage.slice(0, 500),
       });
     }
 
-    return new Response(`Failed to send email: ${err}`, { status: 500 });
+    return new Response(`Failed to send email: ${errorMessage}`, { status: 500 });
   }
 }
 

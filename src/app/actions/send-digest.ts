@@ -184,17 +184,19 @@ export async function sendDigestNow(): Promise<{ success: boolean; message: stri
       message: `Digest sent to ${recipients.join(', ')} with ${sortedArticles.length} articles.`,
     };
   } catch (err) {
-    console.error('[Digest] Failed to send email:', err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('[Digest] Failed to send email:', errorMessage);
 
     for (const recipientEmail of recipients) {
       await db.insert(digests).values({
         recipientEmail,
         articleCount: sortedArticles.length,
         status: 'failed',
+        error: errorMessage.slice(0, 500),
       });
     }
 
     revalidatePath('/');
-    return { success: false, message: `Email failed to send: ${err}` };
+    return { success: false, message: `Email failed to send: ${errorMessage}` };
   }
 }
