@@ -2,12 +2,13 @@ import { schedules } from '@trigger.dev/sdk/v3';
 import { and, eq, inArray } from 'drizzle-orm';
 import React from 'react';
 import { db } from '../db';
-import { articles, companies, config, digests, feeds, topics } from '../db/schema';
+import { articles, companies, digests, feeds, topics } from '../db/schema';
 import { type SearchResult } from '../lib/exa';
 import { fetchRSSFeed } from '../lib/rss';
 import { createResearchAgent, summarizeArticles, type ArticleForSummary } from '../lib/agent';
 import { DigestEmail } from '../lib/email/digest-template';
 import { sendDigestEmail } from '../lib/resend';
+import { digestConfig } from '../lib/digest-config';
 
 // Source tag so we know which table to store articles against
 interface TaggedResult extends SearchResult {
@@ -17,20 +18,12 @@ interface TaggedResult extends SearchResult {
 
 export const dailyDigest = schedules.task({
   id: 'daily-digest',
-  // No hardcoded cron — the schedule is managed dynamically via the config
-  // server action which calls schedules.create() with the user's timezone
-  // and preferred delivery time.
   run: async (payload) => {
     console.log(`[Digest] Starting digest run at ${payload.timestamp.toISOString()}`);
 
-    // 1. Fetch config
-    const [cfg] = await db.select().from(config).limit(1);
-    if (!cfg) {
-      console.log('[Digest] No config found. Skipping.');
-      return;
-    }
+    const { recipients, maxArticlesPerDigest } = digestConfig;
 
-    // 2. Fetch all active topics and companies
+    // 1. Fetch all active topics and companies
     const activeTopics = await db
       .select()
       .from(topics)
@@ -50,11 +43,8 @@ export const dailyDigest = schedules.task({
       `[Digest] Processing ${activeTopics.length} topics + ${activeCompanies.length} companies`
     );
 
-    // 3. Research each topic and company using AI agents (parallel)
-    //    Each agent decomposes the topic into targeted sub-queries and
-    //    searches Exa 2-4 times with a stepCountIs(5) budget.
+    // 2. Research each topic and company using AI agents (parallel)
     const researchPromises = [
-      // Topic research
       ...activeTopics.map(async (topic): Promise<TaggedResult[]> => {
         try {
           const { agent, collectedResults } = createResearchAgent();
@@ -76,7 +66,6 @@ export const dailyDigest = schedules.task({
         }
       }),
 
-      // Company research
       ...activeCompanies.map(async (company): Promise<TaggedResult[]> => {
         try {
           const { agent, collectedResults } = createResearchAgent();
@@ -106,7 +95,7 @@ export const dailyDigest = schedules.task({
     const researchResults = await Promise.all(researchPromises);
     const allResults: TaggedResult[] = researchResults.flat();
 
-    // 3b. Also fetch from any RSS feeds linked to topics
+    // 2b. Also fetch from any RSS feeds linked to topics
     const allFeeds = await db.select().from(feeds);
     for (const feed of allFeeds) {
       try {
@@ -126,13 +115,13 @@ export const dailyDigest = schedules.task({
       return;
     }
 
-    // 4. Dedup against previously stored articles for this recipient
+    // 3. Dedup against previously stored articles for all recipients
     const existingUrls = await db
       .select({ url: articles.url })
       .from(articles)
       .where(
         and(
-          eq(articles.recipientEmail, cfg.email),
+          inArray(articles.recipientEmail, [...recipients]),
           inArray(
             articles.url,
             allResults.map((r) => r.url)
@@ -160,10 +149,9 @@ export const dailyDigest = schedules.task({
       return;
     }
 
-    // Cap to max articles per digest
-    const capped = uniqueNewResults.slice(0, cfg.maxArticlesPerDigest);
+    const capped = uniqueNewResults.slice(0, maxArticlesPerDigest);
 
-    // 5. AI summarize & rank (structured output)
+    // 4. AI summarize & rank (structured output)
     const contextParts = [
       ...activeTopics.map((t) => t.name),
       ...activeCompanies.map((c) => c.name),
@@ -182,28 +170,30 @@ export const dailyDigest = schedules.task({
     console.log('[Digest] Summarizing articles with AI (structured output)...');
     const digest = await summarizeArticles(articlesForSummary, topicContext);
 
-    // 6. Store new articles in DB
+    // 5. Store new articles in DB (one row per recipient for dedup tracking)
     for (const result of capped) {
-      try {
-        await db.insert(articles).values({
-          topicId: result.topicId ?? null,
-          companyId: result.companyId ?? null,
-          recipientEmail: cfg.email,
-          url: result.url,
-          title: result.title,
-          summary:
-            digest.articles.find((a) => a.url === result.url)?.summary ?? null,
-          source: result.source,
-          publishedAt: result.publishedDate
-            ? new Date(result.publishedDate)
-            : null,
-        }).onConflictDoNothing();
-      } catch (err) {
-        console.error(`[Digest] Error storing article ${result.url}:`, err);
+      for (const recipientEmail of recipients) {
+        try {
+          await db.insert(articles).values({
+            topicId: result.topicId ?? null,
+            companyId: result.companyId ?? null,
+            recipientEmail,
+            url: result.url,
+            title: result.title,
+            summary:
+              digest.articles.find((a) => a.url === result.url)?.summary ?? null,
+            source: result.source,
+            publishedAt: result.publishedDate
+              ? new Date(result.publishedDate)
+              : null,
+          }).onConflictDoNothing();
+        } catch (err) {
+          console.error(`[Digest] Error storing article ${result.url}:`, err);
+        }
       }
     }
 
-    // 7. Render email & send
+    // 6. Render email & send
     const today = new Date().toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -229,27 +219,30 @@ export const dailyDigest = schedules.task({
 
     try {
       await sendDigestEmail(
-        cfg.email,
+        [...recipients],
         `Industry Deep Search — Digest — ${today}`,
         emailElement
       );
 
-      // 8. Log successful digest
-      await db.insert(digests).values({
-        recipientEmail: cfg.email,
-        articleCount: sortedArticles.length,
-        status: 'sent',
-      });
+      for (const recipientEmail of recipients) {
+        await db.insert(digests).values({
+          recipientEmail,
+          articleCount: sortedArticles.length,
+          status: 'sent',
+        });
+      }
 
-      console.log(`[Digest] Successfully sent digest with ${sortedArticles.length} articles to ${cfg.email}`);
+      console.log(`[Digest] Successfully sent digest with ${sortedArticles.length} articles to ${recipients.join(', ')}`);
     } catch (err) {
       console.error('[Digest] Failed to send email:', err);
 
-      await db.insert(digests).values({
-        recipientEmail: cfg.email,
-        articleCount: sortedArticles.length,
-        status: 'failed',
-      });
+      for (const recipientEmail of recipients) {
+        await db.insert(digests).values({
+          recipientEmail,
+          articleCount: sortedArticles.length,
+          status: 'failed',
+        });
+      }
     }
   },
 });
