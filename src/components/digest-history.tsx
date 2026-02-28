@@ -15,6 +15,7 @@ interface Digest {
   recipientEmail: string;
   articleCount: number;
   status: 'sent' | 'failed';
+  error: string | null;
 }
 
 export function DigestHistory({ digests }: { digests: Digest[] }) {
@@ -64,6 +65,11 @@ export function DigestHistory({ digests }: { digests: Digest[] }) {
                   <div className="text-xs text-muted-foreground">
                     {digest.articleCount} articles
                   </div>
+                  {digest.error && (
+                    <div className="text-xs text-red-600 bg-red-50 rounded p-2 break-all">
+                      {digest.error}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -77,6 +83,7 @@ export function DigestHistory({ digests }: { digests: Digest[] }) {
                     <TableHead>Recipient</TableHead>
                     <TableHead className="text-center">Articles</TableHead>
                     <TableHead className="text-center">Status</TableHead>
+                    <TableHead>Error</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -101,6 +108,9 @@ export function DigestHistory({ digests }: { digests: Digest[] }) {
                         >
                           {digest.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-red-600 max-w-[200px] truncate">
+                        {digest.error ?? '—'}
                       </TableCell>
                     </TableRow>
                   ))}
