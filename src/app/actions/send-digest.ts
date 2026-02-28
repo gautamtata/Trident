@@ -19,7 +19,7 @@ interface TaggedResult extends SearchResult {
 
 /**
  * Run the full digest pipeline on-demand.
- * Same logic as the Trigger.dev scheduled task but callable from the dashboard.
+ * Same logic as the QStash scheduled endpoint but callable from the dashboard.
  */
 export async function sendDigestNow(): Promise<{ success: boolean; message: string }> {
   const { recipients, maxArticlesPerDigest } = digestConfig;

@@ -13,7 +13,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.29",
     "@react-email/components": "^1.0.7",
-    "@trigger.dev/sdk": "^4.3.3",
+    "@upstash/qstash": "^2.9.0",
     "ai": "^6.0.86",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@trigger.dev/build": "^4.3.3",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
