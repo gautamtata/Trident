@@ -5,6 +5,6 @@
 export const digestConfig = {
   recipients: ['rktata@gmail.com', 'rktata@bechtel.com'],
   cron: '0 6 * * 1', // Every Monday at 6:00 AM
-  timezone: 'Asia/Calcutta',
+  timezone: 'Asia/Kolkata',
   maxArticlesPerDigest: 15,
 } as const;

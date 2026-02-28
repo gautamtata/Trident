@@ -34,7 +34,10 @@ async function main() {
   console.log(`[init]   cron: ${cron}`);
   console.log(`[init]   recipients: ${digestConfig.recipients.join(', ')}`);
 
-  const client = new Client({ token });
+  const client = new Client({
+    token,
+    baseUrl: process.env.QSTASH_URL ?? 'https://qstash.upstash.io',
+  });
 
   const schedule = await client.schedules.create({
     destination,
